@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Always Do Your Best",
+    "text": "Do your homework and help others without expecting rewards!",
+    "emoji": "⭐",
+    "color": "bg-blue-500"
+  },
+  {
+    "title": "Be Kind Always",
+    "text": "Be kind to everyone - friends, family, and even animals!",
+    "emoji": "💖",
+    "color": "bg-pink-500"
+  },
+  {
+    "title": "Stay Calm",
+    "text": "Keep calm and think before you act. Anger makes us do silly things!",
+    "emoji": "🌈",
+    "color": "bg-purple-500"
+  }
+]

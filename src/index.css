@@ -1,0 +1,479 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Sacred Color Palette - Updated to Client Reference */
+    --marigold: 43 99% 50%; /* #FEB703 - Bright Golden Yellow */
+    --marigold-light: 43 100% 65%; /* Lighter Golden Yellow */
+    --marigold-glow: 43 100% 55%; /* Glowing Golden Yellow */
+    --maroon: 0 96% 28%; /* #8D0303 - Dark Red */
+    --maroon-dark: 0 100% 22%; /* Darker Red */
+    --sacred-red: 0 96% 28%; /* Updated to match new maroon */
+    --spiritual-green: 140 100% 37%; /* #00BD40 - Bright Green */
+    --spiritual-green-light: 140 80% 50%; /* Lighter Bright Green */
+
+    /* Core Theme */
+    --background: 43 99% 85%; /* Bright yellow background like reference */
+    --foreground: 0 96% 28%; /* Dark red for text */
+
+    --card: 0 0% 100%; /* Pure white cards */
+    --card-foreground: 0 96% 28%; /* Dark red text on cards */
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 96% 28%;
+
+    --primary: 43 99% 50%; /* Bright Golden Yellow #FEB703 */
+    --primary-foreground: 0 96% 28%; /* Dark red text on yellow */
+
+    --secondary: 0 96% 28%; /* Dark Red #8D0303 */
+    --secondary-foreground: 0 0% 100%; /* White text on red */
+
+    --muted: 43 80% 92%; /* Light yellow for muted areas */
+    --muted-foreground: 0 60% 35%;
+
+    --accent: 0 96% 28%; /* Dark Red accent */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 96% 45%; /* Slightly brighter red for destructive */
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 140 100% 37%; /* Bright Green #00BD40 */
+    --success-foreground: 0 0% 100%;
+
+    --border: 43 60% 75%; /* Yellow-tinted borders */
+    --input: 0 0% 100%; /* White input backgrounds */
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-sacred: linear-gradient(
+      135deg,
+      hsl(var(--maroon)) 0%,
+      hsl(var(--maroon-dark)) 100%
+    );
+    --gradient-marigold: linear-gradient(
+      135deg,
+      hsl(var(--marigold)) 0%,
+      hsl(var(--marigold-light)) 100%
+    );
+    --gradient-warm: linear-gradient(
+      180deg,
+      hsl(40 40% 99%) 0%,
+      hsl(40 30% 95%) 100%
+    );
+
+    /* Shadows */
+    --shadow-card: 0 4px 20px -4px hsl(var(--maroon) / 0.1);
+    --shadow-elevated: 0 8px 30px -8px hsl(var(--maroon) / 0.15);
+    --shadow-glow: 0 0 40px hsl(var(--marigold) / 0.3);
+
+    /* Typography */
+    --font-heading: "Cormorant Garamond", serif;
+    --font-body: "Inter", sans-serif;
+
+    --sidebar-background: 43 99% 85%;
+    --sidebar-foreground: 0 96% 28%;
+    --sidebar-primary: 43 99% 50%;
+    --sidebar-primary-foreground: 0 96% 28%;
+    --sidebar-accent: 0 96% 28%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 43 60% 75%;
+    --sidebar-ring: 43 99% 50%;
+  }
+
+  .dark {
+    --background: 0 60% 8%; /* Dark red tint */
+    --foreground: 43 35% 95%;
+
+    --card: 0 50% 12%;
+    --card-foreground: 43 35% 95%;
+
+    --popover: 0 50% 12%;
+    --popover-foreground: 43 35% 95%;
+
+    --primary: 43 99% 50%; /* Keep bright yellow in dark mode */
+    --primary-foreground: 0 85% 10%;
+
+    --secondary: 0 85% 30%;
+    --secondary-foreground: 43 35% 95%;
+
+    --muted: 0 45% 18%;
+    --muted-foreground: 43 25% 65%;
+
+    --accent: 43 90% 45%; /* Slightly dimmed yellow for dark mode */
+    --accent-foreground: 0 85% 10%;
+
+    --destructive: 0 85% 50%;
+    --destructive-foreground: 43 35% 95%;
+
+    --border: 0 40% 20%;
+    --input: 0 40% 20%;
+    --ring: 43 99% 50%;
+
+    --sidebar-background: 0 60% 8%;
+    --sidebar-foreground: 43 35% 95%;
+    --sidebar-primary: 43 99% 50%;
+    --sidebar-primary-foreground: 0 85% 10%;
+    --sidebar-accent: 0 85% 30%;
+    --sidebar-accent-foreground: 43 35% 95%;
+    --sidebar-border: 0 40% 20%;
+    --sidebar-ring: 43 99% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .font-heading {
+    font-family: var(--font-heading);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  /* Sacred Button Styles */
+  .btn-sacred {
+    @apply bg-primary text-primary-foreground font-semibold px-6 py-3 rounded-lg;
+    @apply transition-all duration-300 ease-out;
+    @apply hover:shadow-lg hover:scale-[1.02];
+    @apply active:scale-[0.98];
+    box-shadow: var(--shadow-card);
+  }
+
+  .btn-sacred:hover {
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Ripple Effect */
+  .ripple {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ripple::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(
+      circle,
+      hsl(var(--marigold) / 0.3) 10%,
+      transparent 10.01%
+    );
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform 0.5s, opacity 0.5s;
+  }
+
+  .ripple:active::after {
+    transform: scale(0, 0);
+    opacity: 0.3;
+    transition: 0s;
+  }
+
+  /* Card Styles */
+  .card-sacred {
+    @apply bg-card rounded-xl border border-border/50;
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s ease;
+  }
+
+  .card-sacred:hover {
+    box-shadow: var(--shadow-elevated);
+    transform: translateY(-2px);
+  }
+
+  /* Marquee Animation */
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+
+  /* Skeleton Loader */
+  .skeleton {
+    @apply bg-muted animate-pulse rounded;
+  }
+
+  /* Bottom Sheet Animation */
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+
+  /* Fade In Animation */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+
+  /* Stagger Children */
+  .stagger-children > * {
+    opacity: 0;
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+
+  .stagger-children > *:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .stagger-children > *:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .stagger-children > *:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .stagger-children > *:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  .stagger-children > *:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+
+  /* Glow Effect */
+  .glow-marigold {
+    box-shadow: 0 0 20px hsl(var(--marigold) / 0.4);
+  }
+
+  /* Bounce Gentle Animation */
+  @keyframes bounce-gentle {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  .animate-bounce-gentle {
+    animation: bounce-gentle 2s ease-in-out infinite;
+  }
+
+  /* Delay utilities */
+  .delay-300 {
+    animation-delay: 300ms;
+  }
+  .delay-700 {
+    animation-delay: 700ms;
+  }
+  .delay-1000 {
+    animation-delay: 1000ms;
+  }
+
+  /* Temple Pattern Overlay */
+  .temple-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23EAA221' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* Pull to Refresh Indicator */
+  .pull-indicator {
+    @apply w-10 h-1 bg-muted-foreground/30 rounded-full mx-auto;
+  }
+
+  /* Toast Notification */
+  .toast-sacred {
+    @apply bg-card border-l-4 border-l-primary rounded-lg shadow-lg p-4;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--marigold));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--marigold-light));
+}
+
+/* Hide scrollbar on mobile for horizontal scrolls */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile Keyboard Handling */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Prevent zoom on input focus on mobile */
+@media screen and (max-width: 640px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Smooth scrolling for mobile dialogs */
+@media screen and (max-width: 640px) {
+  [role="dialog"] {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scroll-padding-top: 20px;
+    scroll-padding-bottom: 20px;
+  }
+
+  /* Ensure dialog adjusts when keyboard opens */
+  [role="dialog"][data-state="open"] {
+    position: fixed;
+    max-height: 85vh;
+    max-height: 85dvh;
+  }
+
+  /* Smooth transition when keyboard appears */
+  body:has([role="dialog"][data-state="open"]) {
+    overflow: hidden;
+  }
+
+  /* Ensure inputs are visible when focused */
+  [role="dialog"] input:focus,
+  [role="dialog"] textarea:focus {
+    scroll-margin-top: 80px;
+    scroll-margin-bottom: 80px;
+  }
+}
+
+/* Scanning Animation for QR Code */
+@keyframes scan {
+  0% {
+    top: 0;
+  }
+  50% {
+    top: 100%;
+  }
+  100% {
+    top: 0;
+  }
+}
+
+.animate-scan {
+  animation: scan 2s linear infinite;
+}
+
+/* Fade In Up Animation */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+/* Confetti Animation */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti-fall 3s linear infinite;
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}

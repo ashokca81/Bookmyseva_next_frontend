@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "bookPooja": "Book a Pooja",
+    "kits": "Pooja Kits",
+    "prasadam": "Prasadam",
+    "onlinePooja": "Online Pooja",
+    "homeService": "Home Service",
+    "blog": "Blog"
+  },
+  "joinUs": {
+    "title": "Join Us",
+    "vendor": "Become a Vendor",
+    "vendorDesc": "Sell pooja items & kits",
+    "poojari": "Become a Poojari",
+    "poojariDesc": "Offer spiritual services",
+    "volunteer": "Become a Volunteer",
+    "volunteerDesc": "Serve with devotion",
+    "homeServiceReq": "Request Home Service",
+    "homeServiceDesc": "Pooja at your doorstep"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "myAccount": "My Account",
+    "guestUser": "Guest User"
+  },
+  "buttons": {
+    "bookNow": "Book Now",
+    "learnMore": "Learn More",
+    "viewAll": "View All",
+    "download": "Download",
+    "explorePoojas": "Explore Poojas",
+    "liveDarshan": "Live Darshan"
+  },
+  "hero": {
+    "welcome": "Welcome",
+    "title": "Divine Services",
+    "subtitle": "At Your Doorstep",
+    "description": "Book authentic temple poojas with verified priests",
+    "slide1Title": "Divine Services",
+    "slide1Subtitle": "At Your Doorstep",
+    "slide2Title": "Premium Pooja Kits",
+    "slide2Subtitle": "Temple Blessed Items",
+    "slide3Title": "Fresh Temple Prasadam",
+    "slide3Subtitle": "Direct to Your Home",
+    "slide4Title": "Live Online Poojas",
+    "slide4Subtitle": "Connect Spiritually"
+  },
+  "services": {
+    "title": "Our Services",
+    "description": "Choose from our wide range of spiritual services",
+    "bookMyPooja": "Book My Pooja",
+    "bookMyPoojaDesc": "Personalized Pooja ceremonies performed by verified temple priests at your home or online.",
+    "poojaKits": "Pooja Kits",
+    "poojaKitsDesc": "Complete pooja samagri kits with authentic items blessed at sacred temples.",
+    "prasadam": "Prasadam",
+    "prasadamDesc": "Sacred blessed offerings from famous temples delivered fresh to your doorstep.",
+    "onlineTemplePooja": "Online Temple Pooja",
+    "onlineTemplePoojaDesc": "Watch live pooja performed on your behalf at renowned temples across India.",
+    "mostPopular": "Most Popular",
+    "fastDelivery": "Fast Delivery",
+    "templeFresh": "Temple Fresh",
+    "reviews": "reviews",
+    "from": "From"
+  },
+  "sidebar": {
+    "downloadApp": "Download App",
+    "downloadAppDesc": "Get the best experience with our mobile app",
+    "gitaTitle": "Bhagavad Gita",
+    "kidsGitaTitle": "Gita for Kids",
+    "chapter": "Chapter",
+    "verse": "Verse",
+    "teachingValues": "Teaching values through sacred stories"
+  },
+  "footer": {
+    "tagline": "ALL SERVICES AT YOUR FINGER TIPS",
+    "description": "Experience authentic spiritual services with verified poojaris, temple-blessed items, and divine blessings delivered to your doorstep.",
+    "services": "Services",
+    "company": "Company",
+    "support": "Support",
+    "followUs": "Follow Us",
+    "downloadApp": "Download Our App",
+    "trustedBy": "Trusted by over 1 lakh+ devotees",
+    "allRightsReserved": "All rights reserved.",
+    "madeWith": "Made with",
+    "in": "in",
+    "india": "India"
+  },
+  "common": {
+    "favorite": "Favorite",
+    "cart": "Cart",
+    "profile": "Profile",
+    "more": "More"
+  }
+}
