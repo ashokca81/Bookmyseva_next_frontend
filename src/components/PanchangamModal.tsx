@@ -1,5 +1,21 @@
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Sun, Moon, Calendar, Clock, Star } from "lucide-react";
+import { Sun, Moon, Calendar, Clock, Star, Loader2 } from "lucide-react";
+import axios from "axios";
+import { API_URL } from "@/config";
+import { format } from "date-fns";
+
+interface PanchangamData {
+  tithi: string;
+  nakshatra: string;
+  yoga: string;
+  karana: string;
+  sunrise: string;
+  sunset: string;
+  moonrise: string;
+  rahu: string;
+  auspiciousTime: string;
+}
 
 interface PanchangamModalProps {
   open: boolean;
@@ -7,20 +23,45 @@ interface PanchangamModalProps {
 }
 
 const PanchangamModal = ({ open, onOpenChange }: PanchangamModalProps) => {
+  const [data, setData] = useState<PanchangamData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const today = new Date();
   const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-  const panchangamData = {
-    tithi: "Shukla Paksha Dwadashi",
-    nakshatra: "Uttara Bhadrapada",
-    yoga: "Shubha",
-    karana: "Bava",
-    rahu: "10:30 AM - 12:00 PM",
-    sunrise: "6:15 AM",
-    sunset: "6:45 PM",
-    moonrise: "4:30 PM",
-    auspiciousTime: "9:00 AM - 10:30 AM, 2:00 PM - 3:30 PM",
+  useEffect(() => {
+    if (!open) return; // Only fetch when modal opens
+
+    const fetchPanchangam = async () => {
+      setIsLoading(true);
+      try {
+        const dateStr = format(new Date(), "yyyy-MM-dd");
+        const response = await axios.get(`${API_URL.replace('/api', '/api/v1')}/content/panchangam?date=${dateStr}`);
+        if (response.data && response.data.tithi) {
+          setData(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch panchangam:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPanchangam();
+  }, [open]);
+
+  // Fallback data when API returns nothing
+  const displayData = data || {
+    tithi: "Data not available",
+    nakshatra: "Data not available",
+    yoga: "—",
+    karana: "—",
+    sunrise: "—",
+    sunset: "—",
+    moonrise: "—",
+    rahu: "Please check later",
+    auspiciousTime: "Please check later",
   };
 
   return (
@@ -36,42 +77,48 @@ const PanchangamModal = ({ open, onOpenChange }: PanchangamModalProps) => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Date Display - White Card */}
-          <div className="text-center p-4 bg-white rounded-xl shadow-md border border-[#8D0303]/10">
-            <p className="text-sm text-[#8D0303]/70 font-medium">{dayNames[today.getDay()]}</p>
-            <p className="text-4xl font-heading font-bold text-[#8D0303]">{today.getDate()}</p>
-            <p className="text-sm text-[#8D0303]/70 font-medium">
-              {monthNames[today.getMonth()]} {today.getFullYear()}
-            </p>
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-[#8D0303]" />
           </div>
-
-          {/* Panchangam Details - White Cards Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            <PanchangamItem icon={<Calendar className="h-4 w-4" />} label="Tithi" value={panchangamData.tithi} />
-            <PanchangamItem icon={<Star className="h-4 w-4" />} label="Nakshatra" value={panchangamData.nakshatra} />
-            <PanchangamItem icon={<Sun className="h-4 w-4" />} label="Sunrise" value={panchangamData.sunrise} />
-            <PanchangamItem icon={<Moon className="h-4 w-4" />} label="Sunset" value={panchangamData.sunset} />
-          </div>
-
-          {/* Auspicious Time - White Card */}
-          <div className="p-4 bg-white border-2 border-[#00BD40]/40 rounded-lg shadow-md">
-            <div className="flex items-center gap-2 text-[#00BD40] font-semibold mb-2">
-              <Clock className="h-5 w-5" />
-              <span className="text-base">Auspicious Time (Shubh Muhurat)</span>
+        ) : (
+          <div className="space-y-4">
+            {/* Date Display - White Card */}
+            <div className="text-center p-4 bg-white rounded-xl shadow-md border border-[#8D0303]/10">
+              <p className="text-sm text-[#8D0303]/70 font-medium">{dayNames[today.getDay()]}</p>
+              <p className="text-4xl font-heading font-bold text-[#8D0303]">{today.getDate()}</p>
+              <p className="text-sm text-[#8D0303]/70 font-medium">
+                {monthNames[today.getMonth()]} {today.getFullYear()}
+              </p>
             </div>
-            <p className="text-sm text-[#8D0303] font-medium">{panchangamData.auspiciousTime}</p>
-          </div>
 
-          {/* Rahu Kalam Warning - White Card */}
-          <div className="p-4 bg-white border-2 border-[#8D0303]/30 rounded-lg shadow-md">
-            <div className="flex items-center gap-2 text-[#8D0303] font-semibold mb-2">
-              <Clock className="h-5 w-5" />
-              <span className="text-base">Rahu Kalam (Avoid)</span>
+            {/* Panchangam Details - White Cards Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <PanchangamItem icon={<Calendar className="h-4 w-4" />} label="Tithi" value={displayData.tithi} />
+              <PanchangamItem icon={<Star className="h-4 w-4" />} label="Nakshatra" value={displayData.nakshatra} />
+              <PanchangamItem icon={<Sun className="h-4 w-4" />} label="Sunrise" value={displayData.sunrise} />
+              <PanchangamItem icon={<Moon className="h-4 w-4" />} label="Sunset" value={displayData.sunset} />
             </div>
-            <p className="text-sm text-[#8D0303] font-medium">{panchangamData.rahu}</p>
+
+            {/* Auspicious Time - White Card */}
+            <div className="p-4 bg-white border-2 border-[#00BD40]/40 rounded-lg shadow-md">
+              <div className="flex items-center gap-2 text-[#00BD40] font-semibold mb-2">
+                <Clock className="h-5 w-5" />
+                <span className="text-base">Auspicious Time (Shubh Muhurat)</span>
+              </div>
+              <p className="text-sm text-[#8D0303] font-medium">{displayData.auspiciousTime}</p>
+            </div>
+
+            {/* Rahu Kalam Warning - White Card */}
+            <div className="p-4 bg-white border-2 border-[#8D0303]/30 rounded-lg shadow-md">
+              <div className="flex items-center gap-2 text-[#8D0303] font-semibold mb-2">
+                <Clock className="h-5 w-5" />
+                <span className="text-base">Rahu Kalam (Avoid)</span>
+              </div>
+              <p className="text-sm text-[#8D0303] font-medium">{displayData.rahu}</p>
+            </div>
           </div>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );

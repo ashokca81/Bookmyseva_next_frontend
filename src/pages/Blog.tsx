@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -8,6 +9,7 @@ import ChatbotWidget from "@/components/ChatbotWidget";
 import { BookOpen, Calendar, Clock, ArrowRight, Search, Sparkles, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import axios from "axios";
 import { format } from "date-fns";
+import { API_URL } from "@/config";
 
 import { useLiveCardState } from "@/hooks/useLiveCardState";
 
@@ -44,12 +46,12 @@ const Blog = () => {
         const fetchData = async () => {
             try {
                 // Fetch Categories
-                const catRes = await axios.get("http://localhost:5001/api/categories");
+                const catRes = await axios.get(`${API_URL}/categories`);
                 const catNames = catRes.data.map((c: { name: string }) => c.name);
                 setCategories(["All", ...catNames]);
 
                 // Fetch Blogs
-                const blogRes = await axios.get("http://localhost:5001/api/blogs?status=published");
+                const blogRes = await axios.get(`${API_URL}/blogs?status=published`);
                 setPosts(blogRes.data);
             } catch (err) {
                 console.error("Failed to fetch blog data", err);

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLiveCardState } from "@/hooks/useLiveCardState";
 import Header from "@/components/Header";
 import BottomNavigation from "@/components/BottomNavigation";
 import MantraMarquee from "@/components/MantraMarquee";
@@ -12,7 +13,9 @@ import BlogSection from "@/components/BlogSection";
 import Footer from "@/components/Footer";
 import LiveStreamCard from "@/components/LiveStreamCard";
 import ChatbotWidget from "@/components/ChatbotWidget";
-import Sidebar from "@/components/Sidebar";
+import Sidebar, { Sloka } from "@/components/Sidebar";
+import axios from "axios";
+import { API_URL } from "@/config";
 import FestivalCountdown from "@/components/FestivalCountdown";
 import DevotionalSongs from "@/components/DevotionalSongs";
 import VolunteerOpportunities from "@/components/VolunteerOpportunities";
@@ -20,56 +23,28 @@ import { Smartphone, BookOpen, Heart, Sparkles, Star } from "lucide-react";
 import appStore from "@/assets/app-store.png";
 import playStore from "@/assets/play-store.png";
 
-const gitaSlokas = [
-  {
-    chapter: 2,
-    verse: 47,
-    telugu: "కర్మణ్యేవాధికారస్తే మా ఫలేషు కదాచన",
-    translation: "You have the right to perform your duty, but not to the fruits of your actions.",
-    theme: "Karma Yoga"
-  },
-  {
-    chapter: 18,
-    verse: 78,
-    telugu: "యత్ర యోగేశ్వరః కృష్ణో యత్ర పార్థో ధనుర్ధరః",
-    translation: "Wherever there is Krishna and Arjuna, there will be victory, prosperity, and morality.",
-    theme: "Divine Presence"
-  },
-  {
-    chapter: 9,
-    verse: 22,
-    telugu: "అనన్యాశ్చిన్తయన్తో మాం యే జనాః పర్యుపాసతే",
-    translation: "Those who worship Me with devotion, I provide what they lack and preserve what they have.",
-    theme: "Divine Protection"
-  }
-];
 
-const kidsGitaSlokas = [
-  {
-    title: "Always Do Your Best",
-    telugu: "నీవు చేయవలసినది చక్కగా చెయ్యి, ఫలితం గురించి ఆలోచించకు",
-    simpleTranslation: "Do your homework and help others without expecting rewards!",
-    emoji: "⭐",
-    color: "bg-blue-500"
-  },
-  {
-    title: "Be Kind Always",
-    telugu: "అందరికీ దయ చూపు, అందరినీ ప్రేమించు",
-    simpleTranslation: "Be kind to everyone - friends, family, and even animals!",
-    emoji: "💖",
-    color: "bg-pink-500"
-  },
-  {
-    title: "Stay Calm",
-    telugu: "ఎప్పుడూ ప్రశాంతంగా ఉండు, కోపం పెట్టుకోకు",
-    simpleTranslation: "Keep calm and think before you act. Anger makes us do silly things!",
-    emoji: "🌈",
-    color: "bg-purple-500"
-  }
-];
 
 const Index = () => {
-  const [isLiveCardDismissed, setIsLiveCardDismissed] = useState(false);
+  const [isLiveCardDismissed, setIsLiveCardDismissed] = useLiveCardState();
+  const [gitaSlokas, setGitaSlokas] = useState<Sloka[]>([]);
+  const [kidsGitaSlokas, setKidsGitaSlokas] = useState<Sloka[]>([]);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const [gitaRes, kidsRes] = await Promise.all([
+          axios.get(`${API_URL.replace('/api', '/api/v1')}/content/gita-sloka?type=gita`),
+          axios.get(`${API_URL.replace('/api', '/api/v1')}/content/gita-sloka?type=kids-gita`)
+        ]);
+        if (gitaRes.data) setGitaSlokas(gitaRes.data);
+        if (kidsRes.data) setKidsGitaSlokas(kidsRes.data);
+      } catch (error) {
+        console.error("Failed to fetch Gita content:", error);
+      }
+    };
+    fetchContent();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -262,7 +237,7 @@ const Index = () => {
           </main>
 
           {/* Sidebar (Desktop Only) - with relative parent for sticky positioning */}
-          <Sidebar />
+          <Sidebar gitaSlokas={gitaSlokas} kidsGitaSlokas={kidsGitaSlokas} />
         </div>
       </div>
 

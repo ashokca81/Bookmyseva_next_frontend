@@ -55,11 +55,12 @@ const Header = ({ isLiveCardDismissed, onLiveButtonClick }: HeaderProps = {}) =>
     <>
       <header className="sticky top-0 z-50 w-full bg-card/95 backdrop-blur-md border-b border-border/50 shadow-card">
         {/* Top Banner */}
-        <div className="hidden md:block bg-gradient-to-r from-[#FEB703] to-[#FFCB05] text-[#8D0303] py-1.5 text-center text-xs font-semibold">
-          <span className="animate-pulse-slow">🪔</span>
-          <span className="mx-2">Special Offer: Book any Pooja & get Prasadam delivered FREE!</span>
-          <span className="animate-pulse-slow">🪔</span>
-        </div>
+        {/* Top Banner */}
+        {config?.headerMarqueeText && (
+          <div className="hidden md:block bg-gradient-to-r from-[#FEB703] to-[#FFCB05] text-[#8D0303] py-1.5 text-center text-xs font-semibold">
+            <span className="mx-2">{config.headerMarqueeText}</span>
+          </div>
+        )}
 
         {/* Main Header */}
         <div className="container relative flex h-20 items-center justify-between px-2 md:px-8">

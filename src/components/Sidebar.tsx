@@ -7,7 +7,7 @@ import playStore from "@/assets/play-store.png";
 
 import { useAppConfig } from "@/hooks/useAppConfig";
 
-interface Sloka {
+export interface Sloka {
   chapter?: number;
   verse?: number;
   theme?: string;
@@ -64,103 +64,107 @@ const Sidebar = ({ gitaSlokas = [], kidsGitaSlokas = [] }: SidebarProps) => {
         </div>
 
         {/* Bhagavad Gita Slokas Section */}
-        <div className="card-sacred p-5 relative overflow-hidden group">
-          {/* Decorative glow */}
-          <div className="absolute -top-10 -right-10 w-24 h-24 bg-marigold/10 rounded-full blur-2xl group-hover:bg-marigold/20 transition-colors duration-500" />
-          <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-spiritual-green/5 rounded-full blur-3xl" />
+        {gitaSlokas.length > 0 && (
+          <div className="card-sacred p-5 relative overflow-hidden group">
+            {/* Decorative glow */}
+            <div className="absolute -top-10 -right-10 w-24 h-24 bg-marigold/10 rounded-full blur-2xl group-hover:bg-marigold/20 transition-colors duration-500" />
+            <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-spiritual-green/5 rounded-full blur-3xl" />
 
-          <div className="relative">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 bg-gradient-to-br from-marigold/20 to-maroon/20 rounded-lg">
-                <BookOpen className="h-5 w-5 text-marigold" />
-              </div>
-              <h3 className="font-heading text-lg font-bold text-foreground">{t('sidebar.gitaTitle')}</h3>
-              <Sparkles className="h-4 w-4 text-marigold ml-auto animate-pulse" />
-            </div>
-
-            <div className="space-y-3">
-              {gitaSlokas.map((sloka, index) => (
-                <div
-                  key={index}
-                  className="p-4 bg-gradient-to-br from-muted/30 to-muted/50 rounded-xl border border-marigold/10"
-                >
-                  {/* Chapter & Verse Reference */}
-                  <div className="flex items-center justify-between mb-2.5">
-                    <span className="text-xs font-bold text-white bg-spiritual-green px-3 py-1.5 rounded-md shadow-md">
-                      {t('sidebar.chapter')} {sloka.chapter} : {t('sidebar.verse')} {sloka.verse}
-                    </span>
-                    <span className="text-xs text-muted-foreground italic">{sloka.theme}</span>
-                  </div>
-
-                  {/* Telugu Sloka */}
-                  <p className="text-sm font-semibold mb-2.5 leading-relaxed font-serif text-foreground/90">
-                    {sloka.telugu}
-                  </p>
-
-                  {/* English Translation */}
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {sloka.translation}
-                  </p>
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 bg-gradient-to-br from-marigold/20 to-maroon/20 rounded-lg">
+                  <BookOpen className="h-5 w-5 text-marigold" />
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Kids Gita Section */}
-        <div className="card-sacred p-5 relative overflow-hidden group">
-          {/* Enhanced decorative elements matching sacred theme */}
-          <div className="absolute -top-10 -right-10 w-24 h-24 bg-marigold/10 rounded-full blur-2xl group-hover:bg-marigold/20 transition-colors duration-500" />
-          <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-spiritual-green/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-4 right-1/4 w-20 h-20 bg-maroon/5 rounded-full blur-2xl" />
-
-          <div className="relative">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 bg-gradient-to-br from-marigold/20 to-spiritual-green/20 rounded-lg">
-                <Heart className="h-5 w-5 text-marigold" />
+                <h3 className="font-heading text-lg font-bold text-foreground">{t('sidebar.gitaTitle')}</h3>
+                <Sparkles className="h-4 w-4 text-marigold ml-auto animate-pulse" />
               </div>
-              <h3 className="font-heading text-lg font-bold text-foreground">{t('sidebar.kidsGitaTitle')}</h3>
-              <Star className="h-4 w-4 text-marigold ml-auto animate-pulse" />
-            </div>
 
-            <p className="text-xs text-muted-foreground mb-4 italic">
-              ✨ Simple wisdom from Bhagavad Gita for young minds
-            </p>
+              <div className="space-y-3">
+                {gitaSlokas.map((sloka, index) => (
+                  <div
+                    key={index}
+                    className="p-4 bg-gradient-to-br from-muted/30 to-muted/50 rounded-xl border border-marigold/10"
+                  >
+                    {/* Chapter & Verse Reference */}
+                    <div className="flex items-center justify-between mb-2.5">
+                      <span className="text-xs font-bold text-white bg-spiritual-green px-3 py-1.5 rounded-md shadow-md">
+                        {t('sidebar.chapter')} {sloka.chapter} : {t('sidebar.verse')} {sloka.verse}
+                      </span>
+                      <span className="text-xs text-muted-foreground italic">{sloka.theme}</span>
+                    </div>
 
-            <div className="space-y-3">
-              {kidsGitaSlokas.map((sloka, index) => (
-                <div
-                  key={index}
-                  className="p-4 bg-gradient-to-br from-muted/30 to-muted/50 rounded-xl border border-marigold/20 hover:border-marigold/40 transition-all duration-300 hover:shadow-lg group/card"
-                >
-                  {/* Title with Emoji */}
-                  <div className="flex items-center gap-2 mb-2.5">
-                    <span className="text-xl group-hover/card:scale-110 transition-transform">{sloka.emoji}</span>
-                    <h4 className="font-bold text-sm text-foreground">{sloka.title}</h4>
-                  </div>
+                    {/* Telugu Sloka */}
+                    <p className="text-sm font-semibold mb-2.5 leading-relaxed font-serif text-foreground/90">
+                      {sloka.telugu}
+                    </p>
 
-                  {/* Telugu Text */}
-                  <p className="text-xs font-semibold mb-2.5 leading-relaxed font-serif text-foreground/90">
-                    {sloka.telugu}
-                  </p>
-
-                  {/* Simple Translation */}
-                  <div className="flex items-start gap-2 p-2 rounded-lg border-l-2 border-marigold/40 bg-marigold/5">
-                    <p className="text-xs leading-relaxed flex-1 text-muted-foreground">
-                      {sloka.simpleTranslation}
+                    {/* English Translation */}
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {sloka.translation}
                     </p>
                   </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-4 p-3 bg-gradient-to-r from-marigold/10 to-spiritual-green/10 rounded-lg border border-marigold/30">
-              <p className="text-xs text-center text-foreground/70 font-semibold">
-                🌟 {t('sidebar.teachingValues')}
-              </p>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Kids Gita Section */}
+        {kidsGitaSlokas.length > 0 && (
+          <div className="card-sacred p-5 relative overflow-hidden group">
+            {/* Enhanced decorative elements matching sacred theme */}
+            <div className="absolute -top-10 -right-10 w-24 h-24 bg-marigold/10 rounded-full blur-2xl group-hover:bg-marigold/20 transition-colors duration-500" />
+            <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-spiritual-green/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-4 right-1/4 w-20 h-20 bg-maroon/5 rounded-full blur-2xl" />
+
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 bg-gradient-to-br from-marigold/20 to-spiritual-green/20 rounded-lg">
+                  <Heart className="h-5 w-5 text-marigold" />
+                </div>
+                <h3 className="font-heading text-lg font-bold text-foreground">{t('sidebar.kidsGitaTitle')}</h3>
+                <Star className="h-4 w-4 text-marigold ml-auto animate-pulse" />
+              </div>
+
+              <p className="text-xs text-muted-foreground mb-4 italic">
+                ✨ Simple wisdom from Bhagavad Gita for young minds
+              </p>
+
+              <div className="space-y-3">
+                {kidsGitaSlokas.map((sloka, index) => (
+                  <div
+                    key={index}
+                    className="p-4 bg-gradient-to-br from-muted/30 to-muted/50 rounded-xl border border-marigold/20 hover:border-marigold/40 transition-all duration-300 hover:shadow-lg group/card"
+                  >
+                    {/* Title with Emoji */}
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <span className="text-xl group-hover/card:scale-110 transition-transform">{sloka.emoji}</span>
+                      <h4 className="font-bold text-sm text-foreground">{sloka.title}</h4>
+                    </div>
+
+                    {/* Telugu Text */}
+                    <p className="text-xs font-semibold mb-2.5 leading-relaxed font-serif text-foreground/90">
+                      {sloka.telugu}
+                    </p>
+
+                    {/* Simple Translation */}
+                    <div className="flex items-start gap-2 p-2 rounded-lg border-l-2 border-marigold/40 bg-marigold/5">
+                      <p className="text-xs leading-relaxed flex-1 text-muted-foreground">
+                        {sloka.simpleTranslation}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 p-3 bg-gradient-to-r from-marigold/10 to-spiritual-green/10 rounded-lg border border-marigold/30">
+                <p className="text-xs text-center text-foreground/70 font-semibold">
+                  🌟 {t('sidebar.teachingValues')}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Premium Offer Card */}
         <div className="card-sacred overflow-hidden relative group">

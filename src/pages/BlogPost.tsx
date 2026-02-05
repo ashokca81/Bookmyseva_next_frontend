@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { format } from "date-fns";
 import ReadOnlyEditor from "@/components/editor/ReadOnlyEditor";
+import { API_URL } from "@/config";
 
 import { useLiveCardState } from "@/hooks/useLiveCardState";
 import {
@@ -31,7 +32,7 @@ const BlogPost = () => {
     interface BlogPost {
         _id: string;
         title: string;
-        content?: string;
+        content?: string | object;
         excerpt?: string;
         image?: string;
         category?: string;
@@ -51,11 +52,11 @@ const BlogPost = () => {
         const fetchPost = async () => {
             try {
                 if (!id) return;
-                const res = await axios.get(`http://localhost:5001/api/blogs/${id}`);
+                const res = await axios.get(`${API_URL}/blogs/${id}`);
                 setPost(res.data);
 
                 // Fetch related (all published for now, filter client side)
-                const allRes = await axios.get("http://localhost:5001/api/blogs?status=published");
+                const allRes = await axios.get(`${API_URL}/blogs?status=published`);
                 const others = allRes.data.filter((p: BlogPost) => p._id !== res.data._id && p.category === res.data.category);
                 setRelatedPosts(others);
 
@@ -196,10 +197,10 @@ const BlogPost = () => {
                                         </span>
                                     </div>
 
-                                    <div className="flex items-center gap-2 whitespace-nowrap text-sm font-medium text-foreground/80">
+                                    {/* <div className="flex items-center gap-2 whitespace-nowrap text-sm font-medium text-foreground/80">
                                         <Clock className="w-4 h-4 text-marigold shrink-0" />
                                         <span>5 min read</span>
-                                    </div>
+                                    </div> */}
                                     <span className="inline-block bg-marigold text-maroon-dark px-3 py-1 rounded-full text-xs font-bold shadow-sm whitespace-nowrap">
                                         {post.category}
                                     </span>

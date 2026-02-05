@@ -114,7 +114,7 @@ const Footer = () => {
               <p className="text-[#8D0303] text-sm font-semibold mb-3">{t('footer.downloadApp')}</p>
               <div className="flex gap-3">
                 <a
-                  href="https://apps.apple.com/app/bookmyseva"
+                  href={config?.iosLink || "https://apps.apple.com/app/bookmyseva"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:scale-105 transition-all hover:drop-shadow-[0_0_8px_rgba(0,189,64,0.5)]"
@@ -122,7 +122,7 @@ const Footer = () => {
                   <img src={appStore} alt="Download on App Store" className="h-10 w-auto" />
                 </a>
                 <a
-                  href="https://play.google.com/store/apps/details?id=com.bookmyseva"
+                  href={config?.androidLink || "https://play.google.com/store/apps/details?id=com.bookmyseva"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:scale-105 transition-all hover:drop-shadow-[0_0_8px_rgba(0,189,64,0.5)]"

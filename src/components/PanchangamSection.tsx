@@ -1,8 +1,36 @@
-import { Sun, Moon, Calendar, Clock, Star } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Sun, Moon, Calendar, Clock, Star, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import axios from "axios";
+import { API_URL } from "@/config";
+import { format } from "date-fns";
+import FestivalBookingModal from "./FestivalBookingModal";
+import { toast } from "sonner";
+
+interface PanchangamData {
+    tithi: string;
+    nakshatra: string;
+    yoga: string;
+    karana: string;
+    sunrise: string;
+    sunset: string;
+    rahu: string;
+    auspiciousTime: string;
+    specialEventName?: string;
+    specialEventDeity?: string;
+    specialEventPooja?: string;
+    specialEventImage?: string;
+    specialEventBookingLink?: string;
+    bookingButtonLabel?: string;
+    isBookingEnabled?: boolean;
+    formFields?: any[];
+}
 
 const PanchangamSection = () => {
+    const [data, setData] = useState<PanchangamData | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const today = new Date();
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -20,17 +48,76 @@ const PanchangamSection = () => {
         Saturday: { deity: "Lord Shani", pooja: "Shani Shanti Pooja", icon: "🪐", teluguDeity: "శని దేవుడు", teluguPooja: "శని శాంతి పూజ" },
     };
 
-    const recommendation = dayRecommendations[dayName];
+    const defaultRec = dayRecommendations[dayName];
 
-    const panchangamData = {
-        tithi: "Shukla Paksha Dwadashi",
-        nakshatra: "Uttara Bhadrapada",
-        yoga: "Shubha",
-        karana: "Bava",
-        rahu: "07:30 - 09:00, 14:00 - 15:30",
-        sunrise: "06:42",
-        sunset: "17:43",
-        auspiciousTime: "16:00 - 18:30",
+    useEffect(() => {
+        const fetchPanchangam = async () => {
+            try {
+                const dateStr = format(new Date(), "yyyy-MM-dd");
+                const response = await axios.get(`${API_URL.replace('/api', '/api/v1')}/content/panchangam?date=${dateStr}`);
+                // Only set data if it has actual panchangam fields (not just message)
+                if (response.data && response.data.tithi) {
+                    setData(response.data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch panchangam:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchPanchangam();
+    }, []);
+
+    const handleBookNow = () => {
+        if (data?.specialEventBookingLink) {
+            window.open(data.specialEventBookingLink, "_blank");
+            return;
+        }
+
+        if (data?.isBookingEnabled) {
+            setIsModalOpen(true);
+        } else {
+            toast.info("Booking not currently available for this event.");
+        }
+    };
+
+    // Construct "festivalData" object for the modal
+    const modalData = data ? {
+        type: "panchangam", // Enquiry type for backend categorization
+        identifier: "daily-panchangam", // Fixed identifier for backend tracking
+        name: data.specialEventName || defaultRec.deity,
+        formFields: data.formFields || []
+    } : null;
+
+    if (isLoading) {
+        return (
+            <div className="py-12 flex justify-center items-center">
+                <Loader2 className="h-8 w-8 animate-spin text-[#8D0303]" />
+            </div>
+        );
+    }
+
+    // Use fetched data or fallbacks when no data from backend
+    const displayData = data || {
+        tithi: "Data not available",
+        nakshatra: "Data not available",
+        yoga: "—",
+        karana: "—",
+        rahu: "Please check later",
+        sunrise: "—",
+        sunset: "—",
+        auspiciousTime: "Please check later"
+    };
+
+    // Determine Logic for Right Panel (Special Event vs Default Day)
+    const isSpecialEvent = !!data?.specialEventName;
+    const currentEvent = {
+        name: data?.specialEventName || "Today's Event",
+        deity: data?.specialEventDeity || defaultRec.deity,
+        pooja: data?.specialEventPooja || defaultRec.pooja,
+        icon: isSpecialEvent ? "✨" : defaultRec.icon,
+        image: data?.specialEventImage
     };
 
     return (
@@ -69,10 +156,10 @@ const PanchangamSection = () => {
 
                         {/* Panchangam Grid */}
                         <div className="grid grid-cols-2 gap-3">
-                            <PanchangamItem icon={<Calendar className="h-4 w-4" />} label="Tithi" value={panchangamData.tithi} />
-                            <PanchangamItem icon={<Star className="h-4 w-4" />} label="Nakshatra" value={panchangamData.nakshatra} />
-                            <PanchangamItem icon={<Sun className="h-4 w-4" />} label="Yoga" value={panchangamData.yoga} />
-                            <PanchangamItem icon={<Moon className="h-4 w-4" />} label="Karana" value={panchangamData.karana} />
+                            <PanchangamItem icon={<Calendar className="h-4 w-4" />} label="Tithi" value={displayData.tithi} />
+                            <PanchangamItem icon={<Star className="h-4 w-4" />} label="Nakshatra" value={displayData.nakshatra} />
+                            <PanchangamItem icon={<Sun className="h-4 w-4" />} label="Yoga" value={displayData.yoga} />
+                            <PanchangamItem icon={<Moon className="h-4 w-4" />} label="Karana" value={displayData.karana} />
                         </div>
 
                         {/* Time Sections */}
@@ -83,7 +170,7 @@ const PanchangamSection = () => {
                                     <Clock className="h-5 w-5" />
                                     <span>Rahu Kalam</span>
                                 </div>
-                                <p className="text-[#8D0303] text-sm font-medium">{panchangamData.rahu}</p>
+                                <p className="text-[#8D0303] text-sm font-medium">{displayData.rahu}</p>
                             </div>
 
                             {/* Auspicious Time */}
@@ -92,37 +179,73 @@ const PanchangamSection = () => {
                                     <Clock className="h-5 w-5" />
                                     <span>Shubh Muhurat</span>
                                 </div>
-                                <p className="text-[#8D0303] text-sm font-medium">{panchangamData.auspiciousTime}</p>
+                                <p className="text-[#8D0303] text-sm font-medium">{displayData.auspiciousTime}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Right Side - Today's Event */}
                     <div className="md:w-[280px]">
-                        <div className="bg-white border-2 border-[#8D0303]/20 rounded-xl p-4 h-full shadow-lg">
-                            <div className="flex items-center gap-2 mb-3">
-                                <Star className="h-4 w-4 text-[#8D0303] fill-[#8D0303]" />
-                                <span className="font-semibold text-[#8D0303] text-sm">Today's Event</span>
-                            </div>
+                        <div className="bg-white border-2 border-[#8D0303]/20 rounded-xl p-4 h-full shadow-lg relative overflow-hidden group">
 
-                            <div className="text-center mb-4">
-                                <span className="text-5xl">{recommendation.icon}</span>
-                                <p className="text-[#8D0303] font-semibold mt-2">{recommendation.deity}</p>
-                            </div>
+                            {/* Image Background if available */}
+                            {currentEvent.image && (
+                                <div className="absolute inset-0">
+                                    <img src={currentEvent.image} alt={currentEvent.name} className="w-full h-full object-cover opacity-20" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent" />
+                                </div>
+                            )}
 
-                            <div className="bg-[#8D0303]/10 rounded-lg p-3 mb-3 border border-[#8D0303]/20">
-                                <p className="text-[#8D0303] font-heading font-bold text-center">{recommendation.pooja}</p>
-                                <p className="text-[#8D0303]/70 text-xs text-center mt-1 font-medium">Recommended for today</p>
-                            </div>
+                            <div className="relative z-10 flex flex-col h-full">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Star className="h-4 w-4 text-[#8D0303] fill-[#8D0303]" />
+                                    <span className="font-semibold text-[#8D0303] text-sm">
+                                        {isSpecialEvent ? "Special Occasion" : "Today's Event"}
+                                    </span>
+                                </div>
 
-                            <Button variant="sacred" size="sm" className="w-full group bg-[#00BD40] hover:bg-[#00BD40]/90 text-white border-none shadow-md hover:shadow-lg hover:shadow-[#00BD40]/30">
-                                Book Now
-                                <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
-                            </Button>
+                                <div className="text-center mb-4 flex-1 flex flex-col justify-center">
+                                    {!currentEvent.image && <span className="text-5xl mb-2 block">{currentEvent.icon}</span>}
+                                    <h3 className="text-xl font-bold text-[#8D0303] leading-tight mb-1">{currentEvent.name}</h3>
+                                    {isSpecialEvent && data?.specialEventName && (
+                                        <p className="text-[#8D0303] font-semibold text-sm">{currentEvent.deity}</p>
+                                    )}
+                                    {!isSpecialEvent && (
+                                        <p className="text-[#8D0303] font-semibold mt-2">{currentEvent.deity}</p>
+                                    )}
+                                </div>
+
+                                <div className="bg-[#8D0303]/10 rounded-lg p-3 mb-3 border border-[#8D0303]/20 backdrop-blur-sm">
+                                    <p className="text-[#8D0303] font-heading font-bold text-center text-sm">{currentEvent.pooja}</p>
+                                    <p className="text-[#8D0303]/70 text-[10px] text-center mt-1 font-medium uppercase tracking-wide">
+                                        {isSpecialEvent ? "Special Pooja" : "Recommended"}
+                                    </p>
+                                </div>
+
+                                {/* Only show button if booking is enabled OR booking link is provided */}
+                                {(data?.isBookingEnabled || data?.specialEventBookingLink) && (
+                                    <Button
+                                        onClick={handleBookNow}
+                                        variant="sacred"
+                                        size="sm"
+                                        className="w-full group bg-[#00BD40] hover:bg-[#00BD40]/90 text-white border-none shadow-md hover:shadow-lg hover:shadow-[#00BD40]/30"
+                                    >
+                                        {data?.bookingButtonLabel || "Book Now"}
+                                        <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Dynamic Booking Modal */}
+            <FestivalBookingModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                festivalData={modalData}
+            />
         </section>
     );
 };

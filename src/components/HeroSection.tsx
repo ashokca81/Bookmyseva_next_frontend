@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import heroTemple from "@/assets/hero-temple.jpg";
 import poojaThali from "@/assets/pooja-thali.jpg";
 import poojaKit from "@/assets/pooja-kit.jpg";
@@ -12,9 +13,12 @@ import { Play, Star, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Pause } fr
 import { QRCodeSVG } from "qrcode.react";
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
+import { useAppConfig } from "@/hooks/useAppConfig";
+import { getImageUrl } from "@/config";
 
 const HeroSection = () => {
   const { t } = useTranslation();
+  const config = useAppConfig();
   const [qrPlatform, setQrPlatform] = useState<"ios" | "android">("android");
   const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
 
@@ -45,7 +49,9 @@ const HeroSection = () => {
       subtitle: "At Your Doorstep",
       description: "Book authentic temple poojas with verified priests",
       primaryCTA: "Explore Poojas",
+      primaryLink: "/poojas",
       secondaryCTA: "Live Darshan",
+      secondaryLink: "/darshan",
       desktopImage: heroTemple,
       mobileImage: poojaThali,
       bgGradient: "from-orange-500 to-amber-600",
@@ -57,7 +63,9 @@ const HeroSection = () => {
       subtitle: "Prasadam Delivered",
       description: "Blessed offerings from renowned temples to your doorstep",
       primaryCTA: "Order Prasadam",
+      primaryLink: "/prasadam",
       secondaryCTA: "View Temples",
+      secondaryLink: "/temples",
       desktopImage: prasadam,
       mobileImage: prasadam,
       bgGradient: "from-rose-500 to-pink-600",
@@ -69,7 +77,9 @@ const HeroSection = () => {
       subtitle: "Ready to Serve",
       description: "Experienced priests for personalized ceremonies",
       primaryCTA: "Find Poojari",
+      primaryLink: "/poojaris",
       secondaryCTA: "Learn More",
+      secondaryLink: "/about",
       desktopImage: poojaKit,
       mobileImage: poojaKit,
       bgGradient: "from-amber-500 to-yellow-600",
@@ -81,7 +91,9 @@ const HeroSection = () => {
       subtitle: "Book in Advance",
       description: "Pre-book festival ceremonies for all occasions",
       primaryCTA: "Browse Festivals",
+      primaryLink: "/festivals",
       secondaryCTA: "View Calendar",
+      secondaryLink: "/calendar",
       desktopImage: onlinePooja,
       mobileImage: onlinePooja,
       bgGradient: "from-red-600 to-orange-600",
@@ -228,43 +240,62 @@ const HeroSection = () => {
         <div className="relative w-full h-full flex flex-col justify-center z-20">
           <div className="px-10 py-8 max-w-2xl">
             {/* Premium Badge */}
-            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-full px-4 py-2 mb-4 border border-marigold/50 shadow-xl transition-all duration-500">
-              <span className="text-xl">
-                {slides[selectedIndex]?.badge.split(' ')[0]}
-              </span>
-              <span className="text-gray-800 font-semibold tracking-wide text-sm">
-                {slides[selectedIndex]?.badge.split(' ').slice(1).join(' ')}
-              </span>
-            </div>
+            {slides[selectedIndex]?.badge && (
+              <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-[8px] px-4 py-1 mb-4 border border-marigold/50 shadow-xl transition-all duration-500">
+                <span className="text-xl">
+                  {slides[selectedIndex]?.badge.split(' ')[0]}
+                </span>
+                <span className="text-gray-800 font-semibold tracking-wide text-sm">
+                  {slides[selectedIndex]?.badge.split(' ').slice(1).join(' ')}
+                </span>
+              </div>
+            )}
 
             {/* Main Headline */}
-            <h1 className="font-heading text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-3 leading-[1.1] tracking-tight transition-all duration-500" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5)' }}>
-              {slides[selectedIndex]?.title}
-              <span className="block mt-2 text-white" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5)' }}>
-                {slides[selectedIndex]?.subtitle}
-              </span>
-            </h1>
+            {(slides[selectedIndex]?.title || slides[selectedIndex]?.subtitle) && (
+              <h1 className="font-heading text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-3 leading-[1.1] tracking-tight transition-all duration-500" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5)' }}>
+                {slides[selectedIndex]?.title}
+                {slides[selectedIndex]?.subtitle && (
+                  <span className="block mt-2 text-white" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5)' }}>
+                    {slides[selectedIndex]?.subtitle}
+                  </span>
+                )}
+              </h1>
+            )}
 
             {/* Subheading */}
-            <p className="text-base lg:text-lg text-white/95 mb-6 max-w-lg leading-relaxed font-medium transition-all duration-500 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-lg" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
-              {slides[selectedIndex]?.description}
-            </p>
+            {slides[selectedIndex]?.description && (
+              <p className="text-base lg:text-lg text-white/95 mb-6 max-w-lg leading-relaxed font-medium transition-all duration-500 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-lg" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
+                {slides[selectedIndex]?.description}
+              </p>
+            )}
 
             {/* CTA Buttons */}
-            <div className="flex flex-row gap-3 mb-6">
-              <Button variant="sacred" size="lg" className="text-base group bg-[#FEB703] hover:bg-[#FEB703]/90 text-[#8D0303] border-none shadow-lg shadow-[#FEB703]/30 hover:shadow-[#FEB703]/50 transition-all duration-500">
-                <span>{slides[selectedIndex]?.primaryCTA}</span>
-                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="text-base border-2 border-secondary-foreground/40 text-secondary-foreground bg-secondary-foreground/5 backdrop-blur-sm hover:bg-secondary-foreground/15 hover:border-secondary-foreground/60 transition-all duration-500"
-              >
-                <Play className="h-4 w-4 mr-2 fill-current" />
-                {slides[selectedIndex]?.secondaryCTA}
-              </Button>
-            </div>
+            {(slides[selectedIndex]?.primaryCTA || slides[selectedIndex]?.secondaryCTA) && (
+              <div className="flex flex-row gap-3 mb-6">
+                {slides[selectedIndex]?.primaryCTA && (
+                  <Button asChild variant="sacred" size="lg" className="text-base group bg-[#FEB703] hover:bg-[#FEB703]/90 text-[#8D0303] border-none shadow-lg shadow-[#FEB703]/30 hover:shadow-[#FEB703]/50 transition-all duration-500">
+                    <Link to={slides[selectedIndex]?.primaryLink || "/"}>
+                      <span>{slides[selectedIndex]?.primaryCTA}</span>
+                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </Button>
+                )}
+                {slides[selectedIndex]?.secondaryCTA && (
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="lg"
+                    className="text-base border-2 border-secondary-foreground/40 text-secondary-foreground bg-secondary-foreground/5 backdrop-blur-sm hover:bg-secondary-foreground/15 hover:border-secondary-foreground/60 transition-all duration-500"
+                  >
+                    <Link to={slides[selectedIndex]?.secondaryLink || "/"}>
+                      <Play className="h-4 w-4 mr-2 fill-current" />
+                      {slides[selectedIndex]?.secondaryCTA}
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            )}
 
             {/* Trust Stats */}
             <div className="flex flex-wrap gap-6 pt-4 pb-4 border-t border-secondary-foreground/10">
@@ -333,23 +364,40 @@ const HeroSection = () => {
             <div className="flex flex-row items-center gap-0">
               <div className="relative group">
                 <div className={`relative bg-white p-2 rounded-xl transition-all duration-500 border ${qrPlatform === "ios" ? "border-blue-500" : "border-[#3DDC84]"}`}>
-                  <div className="relative overflow-hidden rounded-lg">
-                    <QRCodeSVG
-                      value={qrPlatform === "ios"
-                        ? "https://apps.apple.com/app/bookmyseva"
-                        : "https://play.google.com/store/apps/details?id=com.bookmyseva"}
-                      size={100}
-                      level="H"
-                      includeMargin={false}
-                      imageSettings={{
-                        src: qrPlatform === "ios" ? appStoreIcon : playStoreIcon,
-                        x: undefined,
-                        y: undefined,
-                        height: 24,
-                        width: 24,
-                        excavate: true,
-                      }}
-                    />
+                  <div className="relative overflow-hidden rounded-lg w-[100px] h-[100px] flex items-center justify-center bg-white">
+                    {/* Dynamic QR Display Logic */}
+                    {(qrPlatform === "ios" && config?.iosQrImage) ? (
+                      <img
+                        src={getImageUrl(config.iosQrImage)}
+                        alt="iOS QR Code"
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (qrPlatform === "android" && config?.androidQrImage) ? (
+                      <img
+                        src={getImageUrl(config.androidQrImage)}
+                        alt="Android QR Code"
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      // Fallback to Generated QR if no image uploaded
+                      <QRCodeSVG
+                        value={qrPlatform === "ios"
+                          ? (config?.iosLink || "https://apps.apple.com/app/bookmyseva")
+                          : (config?.androidLink || "https://play.google.com/store/apps/details?id=com.bookmyseva")}
+                        size={100}
+                        level="H"
+                        includeMargin={false}
+                        imageSettings={{
+                          src: qrPlatform === "ios" ? appStoreIcon : playStoreIcon,
+                          x: undefined,
+                          y: undefined,
+                          height: 24,
+                          width: 24,
+                          excavate: true,
+                        }}
+                      />
+                    )}
+
                     <div className={`absolute left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-current to-transparent opacity-50 animate-scan ${qrPlatform === "ios" ? "text-blue-500" : "text-[#3DDC84]"}`} />
                   </div>
                 </div>
@@ -359,6 +407,7 @@ const HeroSection = () => {
                 <button
                   onClick={() => setQrPlatform("ios")}
                   className={`relative w-7 h-7 flex items-center justify-center rounded-full transition-all duration-300 ${qrPlatform === "ios" ? "bg-white shadow-lg scale-110" : "hover:bg-white/10 opacity-70 hover:opacity-100"}`}
+                  title="Show iOS QR"
                 >
                   <img
                     src={appStoreIcon}
@@ -370,6 +419,7 @@ const HeroSection = () => {
                 <button
                   onClick={() => setQrPlatform("android")}
                   className={`relative w-7 h-7 flex items-center justify-center rounded-full transition-all duration-300 ${qrPlatform === "android" ? "bg-white shadow-lg scale-110" : "hover:bg-white/10 opacity-70 hover:opacity-100"}`}
+                  title="Show Android QR"
                 >
                   <img
                     src={playStoreIcon}
@@ -411,43 +461,62 @@ const HeroSection = () => {
         <div className="relative w-full h-full flex flex-col justify-center z-20">
           <div className="px-5 py-0 max-w-2xl">
             {/* Premium Badge */}
-            <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-3 py-1.5 mb-3 border border-marigold/50 shadow-xl transition-all duration-500">
-              <span className="text-base">
-                {slides[selectedIndex]?.badge.split(' ')[0]}
-              </span>
-              <span className="text-gray-800 font-semibold tracking-wide text-xs">
-                {slides[selectedIndex]?.badge.split(' ').slice(1).join(' ')}
-              </span>
-            </div>
+            {slides[selectedIndex]?.badge && (
+              <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-[5px] px-3 py-1 mb-3 border border-marigold/50 shadow-xl transition-all duration-500">
+                <span className="text-base">
+                  {slides[selectedIndex]?.badge.split(' ')[0]}
+                </span>
+                <span className="text-gray-800 font-semibold tracking-wide text-xs">
+                  {slides[selectedIndex]?.badge.split(' ').slice(1).join(' ')}
+                </span>
+              </div>
+            )}
 
             {/* Main Headline */}
-            <h1 className="font-heading text-xl font-bold text-white mb-2 leading-[1.1] tracking-tight transition-all duration-500" style={{ textShadow: '2px 2px 6px rgba(0,0,0,0.9), 0 0 15px rgba(0,0,0,0.6)' }}>
-              {slides[selectedIndex]?.title}
-              <span className="block mt-1 text-white" style={{ textShadow: '2px 2px 6px rgba(0,0,0,0.9), 0 0 15px rgba(0,0,0,0.6)' }}>
-                {slides[selectedIndex]?.subtitle}
-              </span>
-            </h1>
+            {(slides[selectedIndex]?.title || slides[selectedIndex]?.subtitle) && (
+              <h1 className="font-heading text-xl font-bold text-white mb-2 leading-[1.1] tracking-tight transition-all duration-500" style={{ textShadow: '2px 2px 6px rgba(0,0,0,0.9), 0 0 15px rgba(0,0,0,0.6)' }}>
+                {slides[selectedIndex]?.title}
+                {slides[selectedIndex]?.subtitle && (
+                  <span className="block mt-1 text-white" style={{ textShadow: '2px 2px 6px rgba(0,0,0,0.9), 0 0 15px rgba(0,0,0,0.6)' }}>
+                    {slides[selectedIndex]?.subtitle}
+                  </span>
+                )}
+              </h1>
+            )}
 
             {/* Subheading */}
-            <p className="text-xs text-white/95 mb-4 max-w-lg leading-relaxed font-medium transition-all duration-500 bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.9)' }}>
-              {slides[selectedIndex]?.description}
-            </p>
+            {slides[selectedIndex]?.description && (
+              <p className="text-xs text-white/95 mb-4 max-w-lg leading-relaxed font-medium transition-all duration-500 bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.9)' }}>
+                {slides[selectedIndex]?.description}
+              </p>
+            )}
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2 mb-3">
-              <Button variant="sacred" size="lg" className="text-sm group bg-[#FEB703] hover:bg-[#FEB703]/90 text-[#8D0303] border-none shadow-lg shadow-[#FEB703]/30 hover:shadow-[#FEB703]/50 transition-all duration-500">
-                <span>{slides[selectedIndex]?.primaryCTA}</span>
-                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="text-sm border-2 border-secondary-foreground/40 text-secondary-foreground bg-secondary-foreground/5 backdrop-blur-sm hover:bg-secondary-foreground/15 hover:border-secondary-foreground/60 transition-all duration-500"
-              >
-                <Play className="h-4 w-4 mr-2 fill-current" />
-                {slides[selectedIndex]?.secondaryCTA}
-              </Button>
-            </div>
+            {(slides[selectedIndex]?.primaryCTA || slides[selectedIndex]?.secondaryCTA) && (
+              <div className="flex flex-col sm:flex-row gap-2 mb-3">
+                {slides[selectedIndex]?.primaryCTA && (
+                  <Button asChild variant="sacred" size="lg" className="w-full sm:w-auto text-sm group bg-[#FEB703] hover:bg-[#FEB703]/90 text-[#8D0303] border-none shadow-lg shadow-[#FEB703]/30 hover:shadow-[#FEB703]/50 transition-all duration-500">
+                    <Link to={slides[selectedIndex]?.primaryLink || "/"}>
+                      <span>{slides[selectedIndex]?.primaryCTA}</span>
+                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </Button>
+                )}
+                {slides[selectedIndex]?.secondaryCTA && (
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto text-sm border-2 border-secondary-foreground/40 text-secondary-foreground bg-secondary-foreground/5 backdrop-blur-sm hover:bg-secondary-foreground/15 hover:border-secondary-foreground/60 transition-all duration-500"
+                  >
+                    <Link to={slides[selectedIndex]?.secondaryLink || "/"}>
+                      <Play className="h-4 w-4 mr-2 fill-current" />
+                      {slides[selectedIndex]?.secondaryCTA}
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            )}
 
             {/* Trust Stats - Card Design for Mobile */}
             <div className="flex justify-center gap-2 pt-2 pb-20">

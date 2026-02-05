@@ -3,30 +3,51 @@ import { Music, Play, Pause, Volume2, VolumeX, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import audioFile from "@/assets/AUD-20260108-WA0008.mp3";
 
+import { useAppConfig } from "@/hooks/useAppConfig"; // Import hook
+
 const FloatingAudioPlayer = () => {
+  const config = useAppConfig(); // Fetch config
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.7);
   const [showPlayer, setShowPlayer] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Auto-play on component mount
+  // Use dynamic URL or fallback
+  const audioSource = config?.audioStreamUrl || audioFile;
+
+  // Auto-play on component mount with persistence check
   useEffect(() => {
+    // Wait for config to load or default fallback
+    if (!audioSource) return;
+
+    const storedState = localStorage.getItem("bms_audio_should_play");
+    // ... rest of useEffect
+    // Default to true (autoplay) only if nothing is stored
+    const shouldPlay = storedState === null ? true : JSON.parse(storedState);
+
     if (audioRef.current) {
       audioRef.current.volume = volume;
-      // Try to autoplay
-      const playPromise = audioRef.current.play();
-      
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch((error) => {
-            // Autoplay was prevented, user needs to click to play
-            console.log("Autoplay prevented:", error);
-            setIsPlaying(false);
-          });
+
+      if (shouldPlay) {
+        // Try to autoplay
+        const playPromise = audioRef.current.play();
+
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsPlaying(true);
+            })
+            .catch((error) => {
+              // Autoplay was prevented, user needs to click to play
+              console.log("Autoplay prevented:", error);
+              setIsPlaying(false);
+              // We don't update localStorage here because the INTENT was to play
+            });
+        }
+      } else {
+        // User previously paused it, so we respect that
+        setIsPlaying(false);
       }
     }
   }, []);
@@ -35,8 +56,10 @@ const FloatingAudioPlayer = () => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
+        localStorage.setItem("bms_audio_should_play", JSON.stringify(false));
       } else {
         audioRef.current.play();
+        localStorage.setItem("bms_audio_should_play", JSON.stringify(true));
       }
       setIsPlaying(!isPlaying);
     }
@@ -71,7 +94,7 @@ const FloatingAudioPlayer = () => {
         ref={audioRef}
         loop
         preload="auto"
-        src={audioFile}
+        src={audioSource}
       />
 
       {/* Floating Audio Player - Modern Card Design */}
@@ -111,14 +134,13 @@ const FloatingAudioPlayer = () => {
             <div className="relative flex-shrink-0">
               <motion.button
                 onClick={togglePlay}
-                className={`w-14 h-14 md:w-12 md:h-12 rounded-full shadow-xl md:shadow-lg hover:shadow-2xl flex items-center justify-center relative overflow-hidden group md:ring-0 ${
-                  isPlaying 
-                    ? 'bg-gradient-to-br from-spiritual-green to-spiritual-green/90 md:from-marigold md:to-marigold-light' 
-                    : 'bg-gradient-to-br from-marigold to-marigold-light'
-                }`}
+                className={`w-14 h-14 md:w-12 md:h-12 rounded-full shadow-xl md:shadow-lg hover:shadow-2xl flex items-center justify-center relative overflow-hidden group md:ring-0 ${isPlaying
+                  ? 'bg-gradient-to-br from-spiritual-green to-spiritual-green/90 md:from-marigold md:to-marigold-light'
+                  : 'bg-gradient-to-br from-marigold to-marigold-light'
+                  }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                animate={isPlaying ? { 
+                animate={isPlaying ? {
                   y: [0, -3, 0],
                   rotate: [0, 5, -5, 0]
                 } : {}}
@@ -193,14 +215,14 @@ const FloatingAudioPlayer = () => {
                         left: '50%',
                         bottom: '100%',
                       }}
-                      initial={{ 
+                      initial={{
                         opacity: 0,
                         y: 0,
                         x: 0,
                         rotate: 0,
                         scale: 0
                       }}
-                      animate={{ 
+                      animate={{
                         opacity: [0, 1, 1, 0],
                         y: [-10, -40 - i * 10],
                         x: [(i - 2) * 15, (i - 2) * 20],
@@ -230,12 +252,12 @@ const FloatingAudioPlayer = () => {
                     background: 'linear-gradient(90deg, transparent, #FEB703, #00BD40, #FEB703, transparent)',
                     filter: 'blur(2px)'
                   }}
-                  animate={{ 
+                  animate={{
                     scaleX: [1, 1.2, 1],
                     opacity: [0.5, 1, 0.5]
                   }}
-                  transition={{ 
-                    duration: 2, 
+                  transition={{
+                    duration: 2,
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
@@ -272,7 +294,7 @@ const FloatingAudioPlayer = () => {
               {/* Title */}
               <div className="flex items-center justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <motion.p 
+                  <motion.p
                     className="text-xs font-bold text-maroon-dark truncate"
                     animate={isPlaying ? { opacity: [0.7, 1, 0.7] } : {}}
                     transition={{ duration: 2, repeat: Infinity }}
@@ -281,7 +303,7 @@ const FloatingAudioPlayer = () => {
                   </motion.p>
                   <p className="text-[10px] text-muted-foreground">Book My Seva</p>
                 </div>
-                
+
                 <button
                   onClick={() => setShowPlayer(false)}
                   className="w-5 h-5 rounded-full hover:bg-muted flex items-center justify-center transition-colors flex-shrink-0"

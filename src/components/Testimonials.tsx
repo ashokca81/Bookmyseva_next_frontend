@@ -1,64 +1,22 @@
 import { useState, useEffect } from "react";
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, Quote, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import axios from "axios";
+import { API_URL } from "@/config";
 
-const testimonials = [
-  {
-    id: 1,
-    name: "Lakshmi Venkatesh",
-    location: "Hyderabad",
-    avatar: "L",
-    rating: 5,
-    text: "The Griha Pravesh pooja was performed beautifully. The pandit was very knowledgeable and explained every ritual. Highly recommend!",
-    service: "Griha Pravesh Pooja",
-  },
-  {
-    id: 2,
-    name: "Ramesh Kumar",
-    location: "Chennai",
-    avatar: "R",
-    rating: 5,
-    text: "Received the Tirupati Prasadam within 2 days. It was fresh and authentic. The packaging was excellent. Will order again!",
-    service: "Temple Prasadam",
-  },
-  {
-    id: 3,
-    name: "Priya Sharma",
-    location: "Bangalore",
-    avatar: "P",
-    rating: 5,
-    text: "Watched my Satyanarayan Pooja live from the temple. The experience was surreal. Thank you Book My Seva for this divine connection.",
-    service: "Online Temple Pooja",
-  },
-  {
-    id: 4,
-    name: "Arun Reddy",
-    location: "Mumbai",
-    avatar: "A",
-    rating: 5,
-    text: "The pooja kit arrived with all necessary items. The quality was exceptional and the instructions were very clear. Perfect for home rituals!",
-    service: "Pooja Kit Delivery",
-  },
-  {
-    id: 5,
-    name: "Meera Iyer",
-    location: "Pune",
-    avatar: "M",
-    rating: 5,
-    text: "Booked a Navagraha Pooja and the experience was divine. The pandit was punctual and performed the rituals with utmost devotion.",
-    service: "Navagraha Pooja",
-  },
-  {
-    id: 6,
-    name: "Suresh Patel",
-    location: "Ahmedabad",
-    avatar: "S",
-    rating: 5,
-    text: "Amazing service! The online darshan was crystal clear and I felt truly blessed. The entire process was seamless and spiritual.",
-    service: "Live Temple Darshan",
-  },
-];
+interface Review {
+  _id: string;
+  name: string;
+  email: string;
+  rating: number;
+  comment: string;
+  city?: string;
+  service?: string;
+  avgRating?: number; // Optional if backend sends stats
+}
 
 const Testimonials = () => {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [touchStart, setTouchStart] = useState(0);
@@ -67,38 +25,63 @@ const Testimonials = () => {
   // Minimum swipe distance (in px) to trigger slide change
   const minSwipeDistance = 50;
 
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await axios.get(`${API_URL.replace('/api', '/api/v1')}/reviews?status=approved&featured=true&limit=10`);
+        setReviews(response.data.reviews || response.data || []);
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []);
+
+  // Display testimonials (if none, show empty state or fallback)
+  const displayReviews = reviews.length > 0 ? reviews : [];
+
   // Auto-slide functionality
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (!isAutoPlaying || displayReviews.length === 0) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => {
-        // On desktop, show 3 cards at a time, so max index is length - 3
-        const maxIndex = window.innerWidth >= 768 ? testimonials.length - 3 : testimonials.length - 1;
+        // On desktop, show 3 cards at a time, so max index is length - 3 (if length >= 3)
+        // If length < 3, just cycle through
+        const itemsToShow = window.innerWidth >= 768 ? 3 : 1;
+        const maxIndex = Math.max(0, displayReviews.length - itemsToShow);
+
+        // If we reached the end, loop back (logic simplified for safety)
         return prevIndex >= maxIndex ? 0 : prevIndex + 1;
       });
-    }, 4000); // Change slide every 4 seconds
+    }, 4000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, displayReviews.length]);
 
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
   };
 
-  const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => {
-      const maxIndex = window.innerWidth >= 768 ? testimonials.length - 3 : testimonials.length - 1;
-      return prevIndex === 0 ? maxIndex : prevIndex - 1;
+  const traverseSlide = (direction: 'next' | 'prev') => {
+    if (displayReviews.length === 0) return;
+    const itemsToShow = window.innerWidth >= 768 ? 3 : 1;
+    const maxIndex = Math.max(0, displayReviews.length - itemsToShow);
+
+    setCurrentIndex((prev) => {
+      if (direction === 'next') {
+        return prev >= maxIndex ? 0 : prev + 1;
+      } else {
+        return prev === 0 ? maxIndex : prev - 1;
+      }
     });
   };
 
-  const goToNext = () => {
-    setCurrentIndex((prevIndex) => {
-      const maxIndex = window.innerWidth >= 768 ? testimonials.length - 3 : testimonials.length - 1;
-      return prevIndex >= maxIndex ? 0 : prevIndex + 1;
-    });
-  };
+  const goToPrevious = () => traverseSlide('prev');
+  const goToNext = () => traverseSlide('next');
 
   // Touch event handlers for swipe
   const onTouchStart = (e: React.TouchEvent) => {
@@ -123,6 +106,20 @@ const Testimonials = () => {
       goToPrevious();
     }
   };
+
+  if (isLoading) {
+    return (
+      <section className="py-16 md:py-10 bg-background">
+        <div className="container px-4 flex justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-[#8D0303]" />
+        </div>
+      </section>
+    )
+  }
+
+  if (displayReviews.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-16 md:py-10 bg-background">
@@ -166,9 +163,9 @@ const Testimonials = () => {
                   : `translateX(-${currentIndex * 100}%)`
               }}
             >
-              {testimonials.map((testimonial) => (
+              {displayReviews.map((review) => (
                 <div
-                  key={testimonial.id}
+                  key={review._id}
                   className="w-full md:w-1/3 flex-shrink-0 px-3"
                 >
                   <div className="card-sacred p-6 relative group h-full">
@@ -179,29 +176,32 @@ const Testimonials = () => {
 
                     {/* Rating */}
                     <div className="flex gap-1 mb-4">
-                      {[...Array(testimonial.rating)].map((_, i) => (
+                      {[...Array(review.rating)].map((_, i) => (
                         <Star key={i} className="h-4 w-4 fill-marigold text-marigold" />
                       ))}
                     </div>
 
                     {/* Text */}
-                    <p className="text-foreground mb-6 relative z-10">
-                      "{testimonial.text}"
+                    {/* Text */}
+                    <p className="text-[#6f1d1d] mb-6 relative z-10 min-h-[80px] font-medium leading-relaxed">
+                      "{review.comment.length > 154 ? `${review.comment.slice(0, 154)}...` : review.comment}"
                     </p>
 
                     {/* Service Tag */}
-                    <span className="inline-block bg-marigold/10 text-marigold text-xs font-medium px-3 py-1 rounded-full mb-4">
-                      {testimonial.service}
-                    </span>
+                    {review.service && (
+                      <span className="inline-block bg-[#FFF9E5] text-[#D97706] text-xs font-bold px-4 py-1.5 rounded-full mb-4 border border-[#FEF3C7]">
+                        {review.service}
+                      </span>
+                    )}
 
                     {/* Author */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 mt-auto">
                       <div className="w-10 h-10 bg-gradient-to-br from-maroon to-maroon-dark rounded-full flex items-center justify-center text-secondary-foreground font-semibold">
-                        {testimonial.avatar}
+                        {review.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">{testimonial.name}</p>
-                        <p className="text-sm text-muted-foreground">{testimonial.location}</p>
+                        <p className="font-semibold text-foreground">{review.name}</p>
+                        <p className="text-sm text-muted-foreground">{review.city || "Devotee"}</p>
                       </div>
                     </div>
                   </div>
@@ -228,7 +228,7 @@ const Testimonials = () => {
 
           {/* Dots Navigation */}
           <div className="flex justify-center gap-2 mt-8">
-            {Array.from({ length: window.innerWidth >= 768 ? testimonials.length - 2 : testimonials.length }).map((_, index) => (
+            {Array.from({ length: window.innerWidth >= 768 ? Math.max(0, displayReviews.length - 2) : displayReviews.length }).map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
@@ -247,7 +247,7 @@ const Testimonials = () => {
           {/* Decorative glow effects */}
           <div className="absolute -top-10 -right-10 w-24 h-24 bg-white/20 rounded-full blur-2xl" />
           <div className="absolute bottom-0 left-1/4 w-32 h-32 bg-spiritual-green/20 rounded-full blur-3xl" />
-          
+
           <div className="relative grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
               { value: "4.9/5", label: "Average Rating" },

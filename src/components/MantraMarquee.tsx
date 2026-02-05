@@ -1,27 +1,45 @@
-const MantraMarquee = () => {
-  const mantras = [
-    { text: "ॐ नमः शिवाय", meaning: "Om Namah Shivaya" },
-    { text: "ॐ गं गणपतये नमः", meaning: "Om Gam Ganapataye Namah" },
-    { text: "ॐ श्री महालक्ष्म्यै नमः", meaning: "Om Sri Mahalakshmyai Namah" },
-    { text: "ॐ नमो नारायणाय", meaning: "Om Namo Narayanaya" },
-    { text: "ॐ ऐं ह्रीं क्लीं चामुण्डायै विच्चे", meaning: "Om Aim Hreem Kleem Chamundaye Vichche" },
-    { text: "ॐ श्री रामाय नमः", meaning: "Om Sri Ramaya Namah" },
-  ];
+import { useState, useEffect } from "react";
 
-  const duplicatedMantras = [...mantras, ...mantras];
+const MantraMarquee = () => {
+  const [mantras, setMantras] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchMantras = async () => {
+      try {
+        const { API_URL } = await import("@/config");
+        // Use v1 path explicitly
+        const response = await fetch(`${API_URL.replace('/api', '/api/v1')}/mantras/list`);
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setMantras(data);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch mantras", error);
+      }
+    };
+    fetchMantras();
+  }, []);
+
+  if (mantras.length === 0) return null;
+
+  const duplicatedMantras = [...mantras, ...mantras, ...mantras, ...mantras]; // Repeat more times for smooth scroll
 
   return (
     <div className="w-full bg-gradient-to-r from-[#FEB703] via-[#FFCB05] to-[#FEB703] py-3 overflow-hidden border-y-2 border-[#8D0303]/20">
       <div className="animate-marquee flex whitespace-nowrap hover:pause">
         {duplicatedMantras.map((mantra, index) => (
-          <div key={index} className="inline-flex items-center mx-8">
+          <div key={`${mantra._id}-${index}`} className="inline-flex items-center mx-8">
             <span className="text-[#8D0303] mr-2 text-xl">🙏</span>
             <span className="text-[#8D0303] font-bold text-lg font-heading drop-shadow-sm">
               {mantra.text}
             </span>
-            <span className="text-[#8D0303]/80 ml-2 text-sm font-medium">
-              ({mantra.meaning})
-            </span>
+            {mantra.transliteration && (
+              <span className="text-[#8D0303]/80 ml-2 text-sm font-medium">
+                ({mantra.transliteration})
+              </span>
+            )}
             <span className="text-[#8D0303] ml-2 font-bold">•</span>
           </div>
         ))}

@@ -1,62 +1,67 @@
 import { Calendar, ArrowRight, Clock, User, BookOpen } from "lucide-react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import { API_URL } from "@/config";
 
-const blogPosts = [
-  {
-    id: 1,
-    title: "The Significance of Maha Shivaratri",
-    excerpt: "Discover the spiritual importance of Shivaratri and the rituals that make this night sacred. Learn about the ancient traditions and their modern relevance.",
-    date: "Feb 20, 2025",
-    readTime: "5 min read",
-    category: "Festival",
-    author: "Pandit Sharma",
-    image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&h=600&fit=crop&crop=faces",
-    featured: true,
-  },
-  {
-    id: 2,
-    title: "How to Perform Satyanarayan Pooja at Home",
-    excerpt: "A complete guide to performing this auspicious pooja with proper mantras and vidhi...",
-    date: "Feb 18, 2025",
-    readTime: "8 min read",
-    category: "Guide",
-    author: "Dr. Priya Iyer",
-    image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&h=600&fit=crop&crop=faces",
-  },
-  {
-    id: 3,
-    title: "Benefits of Reciting Vishnu Sahasranama",
-    excerpt: "Learn about the 1000 names of Lord Vishnu and the blessings they bring...",
-    date: "Feb 15, 2025",
-    readTime: "6 min read",
-    category: "Spirituality",
-    author: "Swami Anand",
-    image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&h=600&fit=crop&crop=faces",
-  },
-  {
-    id: 4,
-    title: "Ganesh Chaturthi: Celebration and Rituals",
-    excerpt: "Explore the vibrant traditions of Ganesh Chaturthi and learn how to celebrate this auspicious festival with devotion...",
-    date: "Feb 12, 2025",
-    readTime: "7 min read",
-    category: "Festival",
-    author: "Pandit Sharma",
-    image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&h=600&fit=crop&crop=faces",
-  },
-  {
-    id: 5,
-    title: "Complete Guide to Diwali Pooja Vidhi",
-    excerpt: "Step-by-step instructions for performing Lakshmi Pooja during Diwali with proper mantras and offerings...",
-    date: "Feb 10, 2025",
-    readTime: "9 min read",
-    category: "Guide",
-    author: "Dr. Priya Iyer",
-    image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&h=600&fit=crop&crop=faces",
-  },
-];
+interface BlogPost {
+  _id: string;
+  title: string;
+  excerpt?: string;
+  image?: string;
+  category?: string;
+  publishedAt?: string;
+  createdAt?: string;
+  author?: string;
+  slug?: string;
+  readTime?: string;
+}
 
 const BlogSection = () => {
-  const featuredPost = blogPosts[0];
-  const regularPosts = blogPosts.slice(1);
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/blogs?status=published`);
+        // Sort by date desc (if not already handled by API)
+        const sorted = res.data.sort((a: BlogPost, b: BlogPost) => {
+          const dateA = new Date(a.publishedAt || a.createdAt || 0).getTime();
+          const dateB = new Date(b.publishedAt || b.createdAt || 0).getTime();
+          return dateB - dateA;
+        });
+        setPosts(sorted);
+      } catch (err) {
+        console.error("Failed to fetch blog posts:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <section className="py-5 md:py-15 bg-muted/30">
+        <div className="container px-4">
+          <div className="flex items-center justify-center h-64">
+            <div className="w-8 h-8 border-4 border-marigold border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (posts.length === 0) {
+    return null; // Don't show section if no posts
+  }
+
+  const featuredPost = posts[0];
+  const regularPosts = posts.slice(1, 4); // Show next 3 posts
 
   return (
     <section className="py-5 md:py-15 bg-muted/30">
@@ -102,70 +107,76 @@ const BlogSection = () => {
         {/* Blog Grid with Featured Post */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Featured Post - Spans 2 columns on desktop */}
-          <article className="group relative md:col-span-2 lg:col-span-2 rounded-xl overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
-            {/* Large Image with Overlay */}
-            <div className="relative h-80 md:h-96 overflow-hidden">
-              <img
-                src={featuredPost.image}
-                alt={featuredPost.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+          {featuredPost && (
+            <article
+              className="group relative md:col-span-2 lg:col-span-2 rounded-xl overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-shadow h-full"
+              onClick={() => navigate(`/blog/${featuredPost.slug || featuredPost._id}`)}
+            >
+              {/* Large Image with Overlay */}
+              <div className="relative h-full min-h-[20rem] md:min-h-[24rem] overflow-hidden">
+                <img
+                  src={featuredPost.image || "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&h=600&fit=crop&crop=faces"}
+                  alt={featuredPost.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
 
-              {/* Content Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white">
-                <span className="inline-block bg-marigold px-3 py-1.5 rounded-full text-xs font-semibold mb-4 shadow-lg">
-                  ⭐ {featuredPost.category}
-                </span>
-
-                <h3 className="font-heading text-2xl md:text-3xl lg:text-4xl font-bold mb-3 leading-tight">
-                  {featuredPost.title}
-                </h3>
-
-                <p className="text-white/90 text-sm md:text-base mb-4 line-clamp-2 max-w-2xl">
-                  {featuredPost.excerpt}
-                </p>
-
-                <div className="flex items-center gap-4 text-sm text-white/80">
-                  <span className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-marigold flex items-center justify-center text-primary-foreground font-semibold">
-                      {featuredPost.author[0]}
-                    </div>
-                    {featuredPost.author}
+                {/* Content Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white">
+                  <span className="inline-block bg-marigold px-3 py-1.5 rounded-full text-xs font-semibold mb-4 shadow-lg text-maroon-dark">
+                    ⭐ {featuredPost.category || 'General'}
                   </span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {featuredPost.date}
-                  </span>
-                  <span>•</span>
+
+                  <h3 className="font-heading text-2xl md:text-3xl lg:text-4xl font-bold mb-3 leading-tight">
+                    {featuredPost.title}
+                  </h3>
+
+                  <p className="text-white/90 text-sm md:text-base mb-4 line-clamp-2 max-w-2xl">
+                    {featuredPost.excerpt}
+                  </p>
+
+                  <div className="flex items-center gap-4 text-sm text-white/80">
+                    <span className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-marigold flex items-center justify-center text-maroon-dark font-semibold">
+                        {(featuredPost.author || "A").charAt(0)}
+                      </div>
+                      {featuredPost.author || "Admin"}
+                    </span>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-3.5 w-3.5" />
+                      {featuredPost.publishedAt ? format(new Date(featuredPost.publishedAt), 'MMM d, yyyy') : (featuredPost.createdAt ? format(new Date(featuredPost.createdAt), 'MMM d, yyyy') : '-')}
+                    </span>
+                    {/* <span>•</span>
                   <span className="flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" />
-                    {featuredPost.readTime}
-                  </span>
+                    {featuredPost.readTime || "5 min read"}
+                  </span> */}
+                  </div>
                 </div>
               </div>
-            </div>
-          </article>
+            </article>
+          )}
 
           {/* Regular Posts */}
           {regularPosts.map((post) => (
             <article
-              key={post.id}
+              key={post._id}
               className="group bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-border hover:border-marigold/50"
+              onClick={() => navigate(`/blog/${post.slug || post._id}`)}
             >
               {/* Image */}
               <div className="relative h-48 overflow-hidden">
                 <img
-                  src={post.image}
+                  src={post.image || "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&h=600&fit=crop&crop=faces"}
                   alt={post.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
                 {/* Category Badge */}
-                <span className="absolute top-3 left-3 bg-marigold/90 backdrop-blur-sm text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
-                  {post.category}
+                <span className="absolute top-3 left-3 bg-marigold/90 backdrop-blur-sm text-maroon-dark px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                  {post.category || 'General'}
                 </span>
               </div>
 
@@ -183,15 +194,15 @@ const BlogSection = () => {
                 <div className="flex items-center justify-between pt-3 border-t border-border">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <div className="w-6 h-6 rounded-full bg-marigold/20 flex items-center justify-center text-marigold font-semibold">
-                      {post.author[0]}
+                      {(post.author || "A").charAt(0)}
                     </div>
-                    <span className="font-medium">{post.author}</span>
+                    <span className="font-medium">{post.author || "Admin"}</span>
                   </div>
 
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {post.readTime}
+                      <Calendar className="h-3 w-3" />
+                      {post.publishedAt ? format(new Date(post.publishedAt), 'MMM d, yyyy') : (post.createdAt ? format(new Date(post.createdAt), 'MMM d, yyyy') : '-')}
                     </span>
                   </div>
                 </div>
